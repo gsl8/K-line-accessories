@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Search, Menu, X, Instagram } from 'lucide-react';
+import { Search, Menu, X, Instagram, Lock } from 'lucide-react';
 import { Logo } from './Logo';
 import { SearchOverlay } from './SearchOverlay';
 import { WhatsAppIcon } from './WhatsAppIcon';
@@ -8,8 +8,8 @@ import { useStore } from '../contexts/StoreContext';
 import { generalWhatsappLink, instagramProfileLink } from '../utils/contact';
 
 const navLinks = [
-{ label: 'Catalog', to: '/catalog' },
-{ label: 'Collections', to: '/catalog' }];
+{ label: 'Shop', to: '/shop' },
+{ label: 'New in', to: '/shop' }];
 
 
 export function Header() {
@@ -78,6 +78,14 @@ export function Header() {
               
               <WhatsAppIcon size={17} />
             </a>
+            <Link
+              to="/admin"
+              aria-label="Admin login"
+              title="Admin login"
+              className="hover:opacity-55 transition-opacity">
+              
+              <Lock size={16} strokeWidth={1.2} />
+            </Link>
           </div>
         </div>
 
@@ -94,20 +102,28 @@ export function Header() {
               Home
             </Link>
             <Link
-            to="/catalog"
+            to="/shop"
             onClick={() => setMenuOpen(false)}
             className="text-[11px] uppercase tracking-[0.2em] text-ink">
             
-              Catalog
+              Shop
             </Link>
             <a
             href={instagramProfileLink(settings)}
             target="_blank"
             rel="noreferrer"
+            onClick={() => setMenuOpen(false)}
             className="text-[11px] uppercase tracking-[0.2em] text-ink">
             
               Instagram
             </a>
+            <Link
+            to="/admin"
+            onClick={() => setMenuOpen(false)}
+            className="text-[11px] uppercase tracking-[0.2em] text-ink/60">
+            
+              Admin login
+            </Link>
           </nav>
         }
       </header>

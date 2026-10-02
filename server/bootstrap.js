@@ -12,5 +12,9 @@ export async function bootstrap() {
     console.log(`[bootstrap] created admin ${config.adminEmail}`);
   }
   if (!await Settings.exists({ singleton: 'store' })) await Settings.create({ ...seed.settings, singleton: 'store' });
-  if (!await Product.exists({}) && Array.isArray(seed.products) && seed.products.length) await Product.insertMany(seed.products, { ordered: false });
+  // Demo catalog removed: no products are seeded on fresh installations.
+  if (Array.isArray(seed.products) && seed.products.length) {
+    await Product.insertMany(seed.products, { ordered: false });
+    console.log(`[bootstrap] seeded ${seed.products.length} products`);
+  }
 }

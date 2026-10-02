@@ -1,11 +1,11 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { StoreProvider } from './contexts/StoreContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { FloatingContact } from './components/FloatingContact';
 import { Home } from './pages/Home';
-import { Catalog } from './pages/Catalog';
+import { Shop } from './pages/Shop';
 import { ProductDetail } from './pages/ProductDetail';
 import { Admin } from './pages/Admin';
 
@@ -34,12 +34,14 @@ export function App() {
             } />
           
           <Route
-            path="/catalog"
+            path="/shop"
             element={
             <Storefront>
-                <Catalog />
+                <Shop />
               </Storefront>
             } />
+          
+          <Route path="/catalog" element={<Navigate to="/shop" replace />} />
           
           <Route
             path="/product/:id"

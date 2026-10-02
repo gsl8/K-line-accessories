@@ -11,7 +11,7 @@ export function NewArrivals() {
 
   return (
     <section id="new-arrivals" className="bg-paper">
-      <SectionHeading title="New arrivals" to="/catalog" />
+      <SectionHeading title="New arrivals" to="/shop" />
       <div className="px-6 md:px-10 lg:px-14 grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-9 md:gap-x-6">
         {items.map((product) =>
         <ProductCard key={product.id} product={product} />

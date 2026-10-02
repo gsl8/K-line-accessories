@@ -7,8 +7,9 @@ if (isProduction) {
   if (missing.length) throw new Error(`Missing required production environment variables: ${missing.join(', ')}`);
 }
 
+const portNumber = Number(process.env.PORT);
 export const config = {
-  port: Number(process.env.PORT || 4000),
+  port: Number.isFinite(portNumber) && portNumber > 0 ? portNumber : 4000,
   mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/kline-shop',
   sessionSecret: process.env.SESSION_SECRET || 'dev-only-change-me',
   adminEmail: (process.env.ADMIN_EMAIL || 'admin@example.com').toLowerCase(),

@@ -1,9 +1,4 @@
-export type Category =
-'Rings' |
-'Earrings' |
-'Necklaces' |
-'Bracelets' |
-'Cuffs';
+export type ProductStatus = 'available' | 'sold_out' | 'hidden';
 
 export interface Spec {
   label: string;
@@ -13,9 +8,10 @@ export interface Spec {
 export interface Product {
   id: string;
   name: string;
-  category: Category;
-  collection: string;
+  reference: string;
+  category: string;
   price: number;
+  compareAtPrice: number | null;
   material: string;
   shortDescription: string;
   description: string;
@@ -23,7 +19,7 @@ export interface Product {
   specs: Spec[];
   sizes: string[];
   images: string[];
-  inStock: boolean;
+  status: ProductStatus;
   isNew: boolean;
   isBestseller: boolean;
 }
@@ -34,6 +30,6 @@ export interface StoreSettings {
   whatsappNumber: string;
   whatsappGreeting: string;
   instagramHandle: string;
-  email: string;
   location: string;
+  categories: string[];
 }

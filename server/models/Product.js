@@ -5,9 +5,10 @@ const specSchema = new mongoose.Schema({ label: { type: String, trim: true }, va
 const productSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true, trim: true, lowercase: true },
   name: { type: String, required: true, trim: true, maxlength: 160 },
-  category: { type: String, required: true, enum: ['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Cuffs'] },
-  collection: { type: String, required: true, trim: true, maxlength: 120 },
+  reference: { type: String, trim: true, maxlength: 80, default: '' },
+  category: { type: String, required: true, trim: true, maxlength: 60 },
   price: { type: Number, required: true, min: 0 },
+  compareAtPrice: { type: Number, min: 0, default: null },
   material: { type: String, trim: true, maxlength: 160, default: '' },
   shortDescription: { type: String, trim: true, maxlength: 500, default: '' },
   description: { type: String, trim: true, maxlength: 6000, default: '' },
@@ -15,7 +16,7 @@ const productSchema = new mongoose.Schema({
   specs: [specSchema],
   sizes: [{ type: String, trim: true, maxlength: 40 }],
   images: [{ type: String, trim: true, maxlength: 2000 }],
-  inStock: { type: Boolean, default: true },
+  status: { type: String, enum: ['available', 'sold_out', 'hidden'], default: 'available' },
   isNew: { type: Boolean, default: false },
   isBestseller: { type: Boolean, default: false }
 }, { timestamps: true, versionKey: false });

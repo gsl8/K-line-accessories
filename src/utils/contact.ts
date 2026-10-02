@@ -1,4 +1,5 @@
 import type { Product, StoreSettings } from '../types/product';
+import { formatRwf } from './money';
 
 export function buildEnquiryMessage(
 product: Product,
@@ -10,13 +11,12 @@ size?: string)
   '',
   `I want to order this piece:`,
   `• ${product.name}`,
-  `• ${product.material}`,
-  `• Collection: ${product.collection}`,
-  `• Price: $${product.price}`];
+  `• Category: ${product.category}`
+  ];
 
-
+  if (product.material) lines.push(`• Details: ${product.material}`);
+  lines.push(`• Price: ${formatRwf(product.price)}`);
   if (size) lines.push(`• Size: ${size}`);
-
   lines.push(`• Reference: ${product.id}`);
   lines.push('');
   lines.push('Could you confirm availability and delivery details?');
@@ -43,6 +43,8 @@ export function instagramProfileLink(settings: StoreSettings): string {
 export function generalWhatsappLink(settings: StoreSettings): string {
   return whatsappLink(
     settings,
-    `${settings.whatsappGreeting}\n\nI'd like to ask about your pieces.`
+    `${settings.whatsappGreeting}
+
+I'd like to ask about your pieces.`
   );
 }

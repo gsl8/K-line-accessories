@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
 import { useStore } from '../contexts/StoreContext';
+import { formatRwf } from '../utils/money';
 
 interface SearchOverlayProps {
   open: boolean;
@@ -33,7 +34,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     if (!q) return [];
     return products.
     filter((p) =>
-    [p.name, p.category, p.collection, p.material].some((field) =>
+    [p.name, p.category, p.material, p.reference].some((field) =>
     field.toLowerCase().includes(q)
     )
     ).
@@ -64,7 +65,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search rings, earrings, collections…"
+            placeholder="Search products…"
             className="flex-1 bg-transparent text-[15px] md:text-[20px] font-light tracking-[0.04em] text-ink placeholder:text-ink/35 focus:outline-none" />
           
           <button
@@ -81,7 +82,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
         <div className="pt-6">
             {results.length === 0 ?
           <p className="text-[11px] uppercase tracking-[0.18em] text-ink/50">
-                No pieces match &ldquo;{query}&rdquo;
+                No products match &ldquo;{query}&rdquo;
               </p> :
 
           <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -100,7 +101,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                       <p className="pt-2 text-[10px] uppercase tracking-[0.14em] text-ink group-hover:opacity-60 transition-opacity">
                         {product.name}
                       </p>
-                      <p className="text-[10px] text-ink/45">$ {product.price}</p>
+                      <p className="text-[10px] text-ink/45">{formatRwf(product.price)}</p>
                     </Link>
                   </li>
             )}

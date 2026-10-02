@@ -19,6 +19,10 @@ export function SettingsForm({ settings, onSave }: SettingsFormProps) {
     setSaved(false);
   }
 
+  function setCategories(value: string) {
+    set('categories', value.split(',').map((c) => c.trim()).filter(Boolean));
+  }
+
   return (
     <form
       onSubmit={async (e) => {
@@ -32,7 +36,8 @@ export function SettingsForm({ settings, onSave }: SettingsFormProps) {
         Store settings
       </h2>
       <p className="text-[11px] text-ink/55 pb-6 max-w-md leading-[1.7]">
-        These details power every WhatsApp and Instagram button across the site.
+        These details power every WhatsApp and Instagram button across the site,
+        plus the category filters in the shop.
       </p>
 
       <div className="grid md:grid-cols-2 gap-5">
@@ -60,11 +65,12 @@ export function SettingsForm({ settings, onSave }: SettingsFormProps) {
         </div>
         <div>
           <label className={label} htmlFor="st-wa">
-            WhatsApp number (country code, digits only)
+            WhatsApp number (with country code, digits only)
           </label>
           <input
             id="st-wa"
             className={field}
+            placeholder="e.g. 250786614269"
             value={draft.whatsappNumber}
             onChange={(e) => set('whatsappNumber', e.target.value)} />
           
@@ -76,25 +82,29 @@ export function SettingsForm({ settings, onSave }: SettingsFormProps) {
           <input
             id="st-ig"
             className={field}
+            placeholder="e.g. kline.accessories"
             value={draft.instagramHandle}
             onChange={(e) => set('instagramHandle', e.target.value)} />
           
         </div>
-        <div>
-          <label className={label} htmlFor="st-email">
-            Contact e-mail
+        <div className="md:col-span-2">
+          <label className={label} htmlFor="st-categories">
+            Shop categories (comma separated)
           </label>
           <input
-            id="st-email"
-            type="email"
+            id="st-categories"
             className={field}
-            value={draft.email}
-            onChange={(e) => set('email', e.target.value)} />
-          
+            placeholder="Bags, Wallets, Waist Chains, Jewelry, Accessories"
+            value={draft.categories.join(', ')}
+            onChange={(e) => setCategories(e.target.value)} />
+          <p className="mt-1.5 text-[10px] text-ink/45">
+            These power the shop filters, the homepage category list and the
+            suggestions in the product form. Add new ones any time.
+          </p>
         </div>
         <div>
           <label className={label} htmlFor="st-location">
-            Location line
+            Location line (optional)
           </label>
           <input
             id="st-location"
@@ -116,7 +126,7 @@ export function SettingsForm({ settings, onSave }: SettingsFormProps) {
           onChange={(e) => set('whatsappGreeting', e.target.value)} />
         
         <p className="mt-2 text-[10px] text-ink/45">
-          The product name, material, price, size and reference are appended
+          The product name, category, price, size and reference are appended
           automatically.
         </p>
       </div>

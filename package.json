@@ -13,11 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "@emotion/react": "^11.13.3",
-    "react-router-dom": "^6.26.2",
-    "lucide-react": "0.522.0",
     "bcryptjs": "^3.0.2",
     "connect-mongo": "^5.1.0",
     "cors": "^2.8.5",
@@ -26,25 +22,31 @@
     "express-rate-limit": "^7.5.1",
     "express-session": "^1.18.2",
     "helmet": "^8.1.0",
+    "lucide-react": "0.522.0",
     "mongoose": "^8.18.0",
+    "multer": "^2.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/multer": "^2.3.0",
     "@types/node": "^20.11.18",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
     "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "latest",
+    "concurrently": "^9.2.1",
     "eslint": "^8.50.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.1",
-    "typescript": "^5.5.4",
-    "vite": "^5.2.0",
-    "tailwindcss": "3.4.17",
-    "autoprefixer": "latest",
     "postcss": "latest",
-    "concurrently": "^9.2.1",
-    "tsx": "^4.20.5"
+    "tailwindcss": "3.4.17",
+    "tsx": "^4.20.5",
+    "typescript": "^5.5.4",
+    "vite": "^5.2.0"
   }
 }

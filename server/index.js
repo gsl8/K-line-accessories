@@ -12,8 +12,10 @@ import { config } from './config.js';
 import { authRouter } from './routes/auth.js';
 import { productsRouter } from './routes/products.js';
 import { settingsRouter } from './routes/settings.js';
+import { adminRouter } from './routes/admin.js';
 import { requireSameOrigin } from './middleware/auth.js';
 import { bootstrap } from './bootstrap.js';
+import { uploadsDir } from './lib/uploads.js';
 
 const app = express();
 if (config.isProduction) app.set('trust proxy', 1);
@@ -32,6 +34,9 @@ app.get('/api/health', (_req,res)=>res.json({ok:true}));
 app.use('/api/auth', authRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/admin', adminRouter);
+// uploaded product images (admin-only writes via /api/admin/upload)
+app.use('/uploads', express.static(uploadsDir, { fallthrough: true, maxAge: '30d' }));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.resolve(__dirname, '../dist');
@@ -43,6 +48,10 @@ app.use((err, _req, res, _next) => {
   console.error(err);
   if (err instanceof ZodError) return res.status(400).json({ error: 'Invalid input', details: err.flatten() });
   if (err?.code === 11000) return res.status(409).json({ error: 'A record with that identifier already exists' });
+  if (err?.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error: 'File too large' });
+  // Body-parser and multer errors carry their own HTTP status (400/413/...).
+  const status = err?.status || err?.statusCode;
+  if (Number.isInteger(status) && status >= 400 && status < 500) return res.status(status).json({ error: status === 413 ? 'Request too large' : 'Invalid request' });
   res.status(500).json({ error: 'Internal server error' });
 });
 
