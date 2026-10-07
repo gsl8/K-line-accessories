@@ -13,9 +13,9 @@ import { authRouter } from './routes/auth.js';
 import { productsRouter } from './routes/products.js';
 import { settingsRouter } from './routes/settings.js';
 import { adminRouter } from './routes/admin.js';
+import { imagesRouter } from './routes/images.js';
 import { requireSameOrigin } from './middleware/auth.js';
 import { bootstrap } from './bootstrap.js';
-import { uploadsDir } from './lib/uploads.js';
 
 const app = express();
 if (config.isProduction) app.set('trust proxy', 1);
@@ -35,8 +35,8 @@ app.use('/api/auth', authRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/admin', adminRouter);
-// uploaded product images (admin-only writes via /api/admin/upload)
-app.use('/uploads', express.static(uploadsDir, { fallthrough: true, maxAge: '30d' }));
+// uploaded product images: served from MongoDB GridFS, written via /api/admin/upload
+app.use('/api/images', imagesRouter);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dist = path.resolve(__dirname, '../dist');

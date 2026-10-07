@@ -1,22 +1,15 @@
 import path from 'node:path';
-import fs from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import crypto from 'node:crypto';
 import multer from 'multer';
 import { Router } from 'express';
 import { z } from 'zod';
 import { Product } from '../models/Product.js';
 import { requireAdmin } from '../middleware/auth.js';
-import { uploadsDir, deleteUpload } from '../lib/uploads.js';
+import { saveImage, deleteImage, imageUrl } from '../lib/images.js';
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, uploadsDir),
-    filename: (_req, file, cb) => {
-      const ext = (path.extname(file.originalname) || '.jpg').toLowerCase();
-      cb(null, `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`);
-    }
-  }),
+  // Files are held in memory and streamed straight into MongoDB GridFS, so no
+  // ephemeral server disk is involved and uploads survive restarts/redeploys.
+  storage: multer.memoryStorage(),
   limits: { fileSize: 8 * 1024 * 1024, files: 10 },
   fileFilter: (_req, file, cb) => {
     // Trust neither mimetype nor extension alone: both must agree on an image type.
@@ -56,14 +49,21 @@ const statusSchema = z.object({ status: z.enum(['available', 'sold_out', 'hidden
 
 // NOTE: multer must run before same-origin/JSON routes are relevant; it is mounted
 // from index.js ahead of requireSameOrigin for multipart requests.
-adminRouter.post('/upload', upload.array('images', 10), (req, res) => {
-  const files = (req.files ?? []).map((f) => `/uploads/${f.filename}`);
-  if (!files.length) return res.status(400).json({ error: 'No images received' });
-  res.status(201).json({ images: files });
+adminRouter.post('/upload', upload.array('images', 10), async (req, res, next) => {
+  try {
+    const files = [];
+    for (const f of req.files ?? []) {
+      const id = await saveImage(f.buffer, { contentType: f.mimetype, originalName: f.originalname });
+      f.savedId = id; // lets cleanupUploaded remove it if the request fails later
+      files.push(imageUrl(id));
+    }
+    if (!files.length) return res.status(400).json({ error: 'No images received' });
+    res.status(201).json({ images: files });
+  } catch (e) { cleanupUploaded(req); next(e); }
 });
 
 function cleanupUploaded(req) {
-  for (const f of req.files ?? []) deleteUpload(f.filename);
+  for (const f of req.files ?? []) if (f.savedId) deleteImage(f.savedId);
 }
 
 adminRouter.post('/products', upload.none(), async (req, res, next) => {
@@ -83,7 +83,7 @@ adminRouter.put('/products/:id', upload.none(), async (req, res, next) => {
     // remove uploaded files that are no longer referenced by any product
     const removed = current.images.filter((img) => !body.images.includes(img));
     const stillUsed = await Product.countDocuments({ images: { $in: removed }, id: { $ne: current.id } });
-    for (const img of removed) if (!stillUsed) deleteUpload(img);
+    if (!stillUsed) for (const img of removed) await deleteImage(img);
     const updated = await Product.findOneAndUpdate({ id: req.params.id }, body, { new: true, runValidators: true });
     res.json(updated);
   } catch (e) { if (req.files?.length) cleanupUploaded(req); next(e); }
@@ -116,7 +116,7 @@ adminRouter.delete('/products/:id', async (req, res, next) => {
     const removed = await Product.findOneAndDelete({ id: req.params.id });
     if (!removed) return res.status(404).json({ error: 'Product not found' });
     const stillUsed = await Product.countDocuments({ images: { $in: removed.images } });
-    if (!stillUsed) for (const img of removed.images) deleteUpload(img);
+    if (!stillUsed) for (const img of removed.images) await deleteImage(img);
     res.status(204).end();
   } catch (e) { next(e); }
 });
