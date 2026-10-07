@@ -1,10 +1,6 @@
 import crypto from 'node:crypto';
 import mongoose from 'mongoose';
 
-// Uploaded images are stored in MongoDB via GridFS so they survive server
-// restarts, instance spin-downs and redeploys (the old ./uploads folder lived
-// on an ephemeral disk and lost every file on redeploy).
-
 let bucketPromise = null;
 
 export function getBucket() {
@@ -13,7 +9,7 @@ export function getBucket() {
       if (mongoose.connection.readyState !== 1) throw new Error('MongoDB is not connected');
       return new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'images' });
     })().catch((err) => {
-      bucketPromise = null; // allow a retry on the next request
+      bucketPromise = null;
       throw err;
     });
   }
@@ -39,9 +35,6 @@ export async function saveImage(buffer, { contentType, originalName } = {}) {
   return stream.id;
 }
 
-// Accepts a public image URL ("/api/images/<24 hex>") or a bare image id.
-// Legacy "/uploads/..." URLs point at files that no longer exist anywhere,
-// so they resolve to a no-op.
 export async function deleteImage(urlOrId) {
   if (!urlOrId) return;
   const value = String(urlOrId);
@@ -52,8 +45,6 @@ export async function deleteImage(urlOrId) {
     const bucket = await getBucket();
     await bucket.delete(new mongoose.Types.ObjectId(id));
   } catch (err) {
-    // A missing file (already deleted) or a transient failure must never break
-    // a product save or delete; orphaned files are harmless.
     console.warn('[images] delete failed:', err?.message || err);
   }
 }

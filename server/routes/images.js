@@ -2,9 +2,6 @@ import { Router } from 'express';
 import mongoose from 'mongoose';
 import { getBucket } from '../lib/images.js';
 
-// Public image serving: GET /api/images/<24-hex-id> streams the file out of
-// GridFS. Image ids are unique per upload, so responses are safe to cache
-// forever. No auth — the storefront displays these directly.
 export const imagesRouter = Router();
 
 imagesRouter.get('/:id', async (req, res, next) => {

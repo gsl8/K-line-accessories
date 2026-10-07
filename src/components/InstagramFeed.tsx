@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { SectionHeading } from './SectionHeading';
+import { SoldOutBadge } from './SoldOutBadge';
 import { useStore } from '../contexts/StoreContext';
 import { instagramProfileLink } from '../utils/contact';
 
@@ -38,6 +39,9 @@ export function InstagramFeed() {
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
           loading="lazy" />
 
+            {product.status === 'sold_out' &&
+            <SoldOutBadge className="absolute top-3 left-3" />
+            }
           </a>
         )}
       </div>

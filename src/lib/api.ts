@@ -16,10 +16,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return response.json();
 }
 
-async function multipart<T>(path: string, formData: FormData): Promise<T> {
+async function multipart<T>(path: string, formData: FormData, method: 'POST' | 'PUT' = 'POST'): Promise<T> {
   const response = await fetch(`${API}${path}`, {
     credentials: 'include',
-    method: 'POST',
+    method,
     body: formData
   });
   if (!response.ok) {
@@ -48,7 +48,7 @@ export const api = {
     const form = new FormData();
     form.append('payload', JSON.stringify(product));
     for (const file of newImages) form.append('images', file);
-    return multipart<Product>(`/admin/products/${encodeURIComponent(id)}`, form);
+    return multipart<Product>(`/admin/products/${encodeURIComponent(id)}`, form, 'PUT');
   },
 
   uploadImages: (form: FormData) =>

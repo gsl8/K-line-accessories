@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { SoldOutBadge } from './SoldOutBadge';
 import { useStore } from '../contexts/StoreContext';
 
 export function Hero() {
@@ -48,21 +49,30 @@ export function Hero() {
           <div className="absolute inset-0 grid grid-cols-2 gap-1 p-1">
             <div className="flex flex-col gap-1">
               {covers.slice(0, 2).map((product) =>
-              <img
-                key={product.id}
-                src={product.images[0]}
-                alt={product.name}
-                className="min-h-0 w-full flex-1 object-cover"
-                loading="eager" />
+              <div key={product.id} className="relative min-h-0 flex-1">
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="h-full w-full object-cover"
+                  loading="eager" />
+                {product.status === 'sold_out' &&
+                <SoldOutBadge className="absolute top-2 left-2" />
+                }
+              </div>
               
               )}
             </div>
             {covers[2] &&
-            <img
-              src={covers[2].images[0]}
-              alt={covers[2].name}
-              className="h-full w-full object-cover"
-              loading="eager" />
+            <div className="relative h-full">
+              <img
+                src={covers[2].images[0]}
+                alt={covers[2].name}
+                className="h-full w-full object-cover"
+                loading="eager" />
+              {covers[2].status === 'sold_out' &&
+              <SoldOutBadge className="absolute top-2 left-2" />
+              }
+            </div>
             
             }
           </div> :

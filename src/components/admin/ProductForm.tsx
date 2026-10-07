@@ -15,6 +15,34 @@ const field =
 
 const MAX_FILE_MB = 8;
 const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp'];
+const WEBP_QUALITY = 0.85;
+const MAX_DIMENSION = 2000;
+
+async function toWebp(file: File): Promise<File> {
+  if (file.type === 'image/webp') return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_DIMENSION / Math.max(bitmap.width, bitmap.height));
+    const width = Math.max(1, Math.round(bitmap.width * scale));
+    const height = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      bitmap.close();
+      return file;
+    }
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', WEBP_QUALITY));
+    if (!blob || blob.type !== 'image/webp' || blob.size >= file.size) return file;
+    const name = file.name.replace(/\.[^.]+$/, '') + '.webp';
+    return new File([blob], name, { type: 'image/webp' });
+  } catch {
+    return file;
+  }
+}
 
 function slugify(value: string) {
   return value.
@@ -81,12 +109,12 @@ export function ProductForm({
     fileInputRef.current?.click();
   }
 
-  function onFilesChosen(event: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []);
+  async function onFilesChosen(event: React.ChangeEvent<HTMLInputElement>) {
+    const chosen = Array.from(event.target.files ?? []);
     event.target.value = '';
-    if (files.length === 0) return;
+    if (chosen.length === 0) return;
     const bad: string[] = [];
-    for (const file of files) {
+    for (const file of chosen) {
       if (!ACCEPTED.includes(file.type)) bad.push(`${file.name}: unsupported type`);
       else if (file.size > MAX_FILE_MB * 1024 * 1024) bad.push(`${file.name}: larger than ${MAX_FILE_MB} MB`);
     }
@@ -94,6 +122,7 @@ export function ProductForm({
       setError(bad.join(' · '));
       return;
     }
+    const files = await Promise.all(chosen.map(toWebp));
     setError('');
     const target = replaceTargetRef.current;
     replaceTargetRef.current = null;

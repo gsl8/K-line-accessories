@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
+import { SoldOutBadge } from './SoldOutBadge';
 import { useStore } from '../contexts/StoreContext';
 import { formatRwf } from '../utils/money';
 
@@ -93,10 +94,15 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                 onClick={onClose}
                 className="group block">
                 
-                      <img
+                      <div className="relative">
+                <img
                   src={product.images[0]}
                   alt=""
                   className="aspect-square w-full object-cover" />
+                {product.status === 'sold_out' &&
+                <SoldOutBadge className="absolute top-2 left-2" />
+                }
+                      </div>
                 
                       <p className="pt-2 text-[10px] uppercase tracking-[0.14em] text-ink group-hover:opacity-60 transition-opacity">
                         {product.name}

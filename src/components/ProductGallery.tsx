@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { SoldOutBadge } from './SoldOutBadge';
 
 interface ProductGalleryProps {
   images: string[];
   name: string;
+  soldOut?: boolean;
 }
 
-export function ProductGallery({ images, name }: ProductGalleryProps) {
+export function ProductGallery({ images, name, soldOut = false }: ProductGalleryProps) {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -54,7 +56,9 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
           src={images[active]}
           alt={`${name} — view ${active + 1}`}
           className="w-full aspect-[4/5] object-cover" />
-        
+        {soldOut &&
+        <SoldOutBadge className="absolute top-3 left-3" />
+        }
 
         {images.length > 1 &&
         <>

@@ -81,7 +81,7 @@ export function ProductDetail() {
       </nav>
 
       <div className="px-6 md:px-10 lg:px-14 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 pb-16">
-        <ProductGallery images={product.images} name={product.name} />
+        <ProductGallery images={product.images} name={product.name} soldOut={product.status === 'sold_out'} />
 
         <div className="lg:pt-4">
           <p className="text-[9px] uppercase tracking-[0.24em] text-ink/45">

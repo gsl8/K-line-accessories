@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { Product } from '../types/product';
 import { formatRwf } from '../utils/money';
+import { SoldOutBadge } from './SoldOutBadge';
 
 interface ProductCardProps {
   product: Product;
@@ -10,7 +11,7 @@ interface ProductCardProps {
 
 const statusBadge: Record<Product['status'], { label: string; className: string } | null> = {
   available: null,
-  sold_out: { label: 'Sold out', className: 'bg-ink text-white' },
+  sold_out: null,
   hidden: { label: 'Hidden', className: 'bg-ink/60 text-white' }
 };
 
@@ -37,7 +38,9 @@ export function ProductCard({
           </div>
           }
 
-          {badge &&
+          {soldOut ?
+          <SoldOutBadge className="absolute top-3 left-3" /> :
+          badge &&
           <span className={`absolute top-3 left-3 text-[8px] uppercase tracking-[0.2em] px-2 py-1 ${badge.className}`}>
               {badge.label}
             </span>
